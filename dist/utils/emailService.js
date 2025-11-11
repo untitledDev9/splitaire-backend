@@ -10,6 +10,7 @@ const billCalculations_1 = require("./billCalculations");
 /**
  * Create email transporter
  */
+console.log("Here u gp", config_1.default.email);
 const createTransporter = () => {
     return nodemailer_1.default.createTransport({
         host: config_1.default.email.host,

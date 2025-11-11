@@ -164,6 +164,30 @@ const billSchema = new mongoose_1.Schema({
         trim: true,
         maxlength: [1000, 'Notes cannot exceed 1000 characters'],
     },
+    // 👇 NEW: Account details for payments
+    accountDetails: {
+        bankName: {
+            type: String,
+            trim: true,
+        },
+        accountNumber: {
+            type: String,
+            trim: true,
+        },
+        accountHolderName: {
+            type: String,
+            trim: true,
+        },
+        paymentHandle: {
+            type: String, // e.g., PayPal, Cash App, Venmo, etc.
+            trim: true,
+        },
+        currency: {
+            type: String,
+            default: 'USD',
+            uppercase: true,
+        },
+    },
     isSettled: {
         type: Boolean,
         default: false,
@@ -179,13 +203,13 @@ const billSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
 });
-// Index for efficient queries
+// Indexes
 billSchema.index({ billId: 1 });
 billSchema.index({ createdBy: 1 });
 billSchema.index({ 'participants.email': 1 });
 billSchema.index({ createdAt: -1 });
 billSchema.index({ expiresAt: 1 });
-// Middleware to check if bill is settled
+// Middleware to update settlement status
 billSchema.pre('save', function (next) {
     const allPaid = this.participants.every((p) => p.isPaid);
     if (allPaid && !this.isSettled) {
@@ -198,7 +222,7 @@ billSchema.pre('save', function (next) {
     }
     next();
 });
-// Virtual for checking if bill is expired (for guest bills)
+// Virtual for checking if bill is expired
 billSchema.virtual('isExpired').get(function () {
     return this.expiresAt ? new Date() > this.expiresAt : false;
 });

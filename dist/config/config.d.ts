@@ -12,7 +12,7 @@ interface Config {
         from: string;
     };
     frontendUrl: string;
-    corsOrigin: string;
+    corsOrigin: string[];
 }
 declare const config: Config;
 export default config;

@@ -15,7 +15,8 @@ const emailService_1 = require("../utils/emailService");
  */
 const createBill = async (req, res, next) => {
     try {
-        const { billName, totalAmount, currency = 'USD', participants, items, splitMethod, customSplits, notes, createdByName, createdByEmail, } = req.body;
+        const { billName, totalAmount, currency = 'USD', participants, items, splitMethod, customSplits, notes, createdByName, createdByEmail, accountDetails, // NEW: Accept account details
+         } = req.body;
         // Validate item-based splits
         if (items && items.length > 0) {
             const validation = (0, billCalculations_1.validateItemParticipants)(participants, items);
@@ -49,6 +50,16 @@ const createBill = async (req, res, next) => {
             splitMethod,
             notes,
         };
+        // Add account details if provided
+        if (accountDetails) {
+            billData.accountDetails = {
+                bankName: accountDetails.bankName || '',
+                accountNumber: accountDetails.accountNumber || '',
+                accountHolderName: accountDetails.accountHolderName || '',
+                paymentHandle: accountDetails.paymentHandle || '',
+                currency: accountDetails.currency || currency,
+            };
+        }
         // Add creator info based on authentication status
         if (req.user) {
             billData.createdBy = req.user.id;
@@ -82,6 +93,7 @@ const createBill = async (req, res, next) => {
                 items: bill.items,
                 splitMethod: bill.splitMethod,
                 notes: bill.notes,
+                accountDetails: bill.accountDetails, // Include account details in response
                 isSettled: bill.isSettled,
                 createdAt: bill.createdAt,
             },
@@ -119,6 +131,7 @@ const getBillById = async (req, res, next) => {
                 items: bill.items,
                 splitMethod: bill.splitMethod,
                 notes: bill.notes,
+                accountDetails: bill.accountDetails, // Include account details in response
                 isSettled: bill.isSettled,
                 settledAt: bill.settledAt,
                 createdAt: bill.createdAt,
@@ -225,6 +238,16 @@ const updateBill = async (req, res, next) => {
             bill.items = updates.items;
         if (updates.notes !== undefined)
             bill.notes = updates.notes;
+        // Update account details if provided
+        if (updates.accountDetails) {
+            bill.accountDetails = {
+                bankName: updates.accountDetails.bankName || bill.accountDetails?.bankName || '',
+                accountNumber: updates.accountDetails.accountNumber || bill.accountDetails?.accountNumber || '',
+                accountHolderName: updates.accountDetails.accountHolderName || bill.accountDetails?.accountHolderName || '',
+                paymentHandle: updates.accountDetails.paymentHandle || bill.accountDetails?.paymentHandle || '',
+                currency: updates.accountDetails.currency || bill.accountDetails?.currency || bill.currency,
+            };
+        }
         await bill.save();
         // Send update notifications
         const updaterName = req.user?.fullName || bill.createdByName || 'Someone';
@@ -247,6 +270,7 @@ const updateBill = async (req, res, next) => {
                 items: bill.items,
                 splitMethod: bill.splitMethod,
                 notes: bill.notes,
+                accountDetails: bill.accountDetails, // Include account details in response
                 isSettled: bill.isSettled,
                 updatedAt: bill.updatedAt,
             },

@@ -19,7 +19,9 @@ const config = {
         from: process.env.EMAIL_FROM || 'noreply@billsplitter.com',
     },
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
-    corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    corsOrigin: process.env.CORS_ORIGIN
+        ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
+        : ['http://localhost:3000'],
 };
 exports.default = config;
 //# sourceMappingURL=config.js.map

@@ -9,6 +9,13 @@ export interface IUser extends Document {
     updatedAt: Date;
     comparePassword(candidatePassword: string): Promise<boolean>;
 }
+export interface IAccountDetails {
+    bankName?: string;
+    accountNumber?: string;
+    accountHolderName?: string;
+    paymentHandle?: string;
+    currency?: string;
+}
 export interface IParticipant {
     participantId?: string;
     name: string;
@@ -42,6 +49,7 @@ export interface IBill extends Document {
     items?: IBillItem[];
     splitMethod: SplitMethod;
     notes?: string;
+    accountDetails?: IAccountDetails;
     isSettled: boolean;
     settledAt?: Date;
     createdAt: Date;
@@ -84,6 +92,7 @@ export interface CreateBillRequest {
     notes?: string;
     createdByName?: string;
     createdByEmail?: string;
+    accountDetails?: IAccountDetails;
 }
 export interface UpdateBillRequest {
     billName?: string;
@@ -96,6 +105,7 @@ export interface UpdateBillRequest {
     splitMethod?: SplitMethod;
     customSplits?: ICustomSplit[];
     notes?: string;
+    accountDetails?: IAccountDetails;
 }
 export interface MarkPaymentRequest {
     participantEmail: string;
